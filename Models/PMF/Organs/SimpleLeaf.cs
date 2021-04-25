@@ -29,7 +29,7 @@
     /// The effect of growth rate on transpiration is captured by the Fractional Growth Rate (FRGR) function, which is passed to the MicroClimate model.
     /// </remarks>
     [Serializable]
-    [ViewName("UserInterface.Views.GridView")]
+    [ViewName("UserInterface.Views.PropertyView")]
     [PresenterName("UserInterface.Presenters.PropertyPresenter")]
     [ValidParent(ParentType = typeof(Plant))]
     public class SimpleLeaf : Model, ICanopy, IHasWaterDemand,  IOrgan, IArbitration, ICustomDocumentation, IOrganDamage
@@ -670,10 +670,30 @@
 
                 double totalRadn = 0;
                 for (int i = 0; i < LightProfile.Length; i++)
-                    totalRadn += LightProfile[i].amount;
+                    totalRadn += LightProfile[i].AmountOnGreen;
                 return totalRadn;
             }
         }
+
+        /// <summary>
+        /// Radiation intercepted by the dead components of the canopy.
+        /// </summary>
+        [Units("MJ/m^2/day")]
+        public double RadiationInterceptedByDead
+        {
+            get
+            {
+                if (LightProfile == null)
+                    return 0;
+
+                double totalRadn = 0;
+                for (int i = 0; i < LightProfile.Length; i++)
+                    totalRadn += LightProfile[i].AmountOnDead;
+                return totalRadn;
+            }
+        }
+
+
 
         /// <summary>
         /// Daily maximum stomatal conductance.

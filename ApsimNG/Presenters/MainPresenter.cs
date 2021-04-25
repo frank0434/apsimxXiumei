@@ -186,7 +186,11 @@
             };
 
             var compiler = new ScriptCompiler();
+#if NETFRAMEWORK
             var results = compiler.Compile(code, new Model(), assemblies);
+#else
+            var results = compiler.Compile(code, new Model());
+#endif
             if (results.ErrorMessages != null)
                 throw new Exception($"Script compile errors: {results.ErrorMessages}");
 
@@ -216,7 +220,7 @@
         /// For error messages, use <see cref="ShowError(Exception)"/>.
         /// </summary>
         /// <param name="message">The message test</param>
-        /// <param name="errorLevel">The error level value</param>
+        /// <param name="messageType">The error level value</param>
         public void ShowMessage(string message, Simulation.MessageType messageType)
         {
             Simulation.ErrorLevel errorType = Simulation.ErrorLevel.Information;
@@ -341,6 +345,7 @@
         /// Show progress bar with the specified percent.
         /// </summary>
         /// <param name="percent">The progress</param>
+        /// <param name="showStopButton">Should a stop button be displayed as well?</param>
         public void ShowProgress(int percent, bool showStopButton = true)
         {
             this.view.ShowProgress(percent, showStopButton);
@@ -1111,7 +1116,7 @@
             }
             catch (Exception err)
             {
-                ShowError(err);
+                throw new Exception("Error during Import: " + err.Message);
             }
         }
 
@@ -1127,10 +1132,7 @@
                 bool onLeftTabControl = view.IsControlOnLeft(sender);
                 // Clear the message window
                 view.ShowMessage(" ", Simulation.ErrorLevel.Information);
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                    CreateNewTab("View Cloud Jobs", null, onLeftTabControl, "ApsimNG.Resources.Glade.CloudJobView.glade", "UserInterface.Presenters.CloudJobPresenter");
-                else
-                    ShowError("Microsoft Azure functionality is currently only available under Windows.");
+                CreateNewTab("View Cloud Jobs", null, onLeftTabControl, "ApsimNG.Resources.Glade.CloudJobView.glade", "UserInterface.Presenters.CloudJobPresenter");
             }
             catch (Exception err)
             {
